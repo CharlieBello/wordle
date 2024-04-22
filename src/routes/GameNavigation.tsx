@@ -11,9 +11,9 @@ const Stack = createNativeStackNavigator();
 export default function GameNavigation() {
   return (
     <NavigationContainer>
-        <Stack.Navigator initialRouteName='Home'>
-            <Stack.Screen name='Home' component={HomeScreen} options={{headerShown:false}} />
-            <Stack.Screen name='Game' component={GameScreen} />
+        <Stack.Navigator initialRouteName='Home' screenOptions={{headerShown:false}}>
+            <Stack.Screen name='Home' component={HomeScreen} />
+            <Stack.Screen name='Game' component={GameScreen} options={{gestureEnabled: false}} />
             <Stack.Screen name='Puntuacion' component={PuntajeScreen} />
         </Stack.Navigator>
     </NavigationContainer>

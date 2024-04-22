@@ -6,19 +6,23 @@ import {
   TouchableOpacity,
   Modal,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Caja from "../components/Caja";
 import Vacio from "../components/Vacio";
+import { GameContext } from "../context/GameContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { historial } from "../interface/historial";
 
-export default function GameScreen() {
+export default function GameScreen({navigation}: any) {
+  var {setUltimo, setCambio} = useContext(GameContext);
   const words: string[] = ["COLAR", "ABEJA", "CARAS", "MENOS"];
   const [input, setInput] = useState("");
   const [intento, setIntento] = useState(1);
-  const [resultados, setResultados] = useState(false);
-  const [perder, setPerder] = useState(false);
   const [ganar, setGanar] = useState(false);
   const [historial, setHistorial] = useState([] as React.JSX.Element[]);
   var color = "lightgrey";
+  var aciertos = 0
+  var errados = 0
   const [vacio, setVacio] = useState([
     <Vacio />,
     <Vacio />,
@@ -27,7 +31,7 @@ export default function GameScreen() {
     <Vacio />,
   ]);
   const [indice, setIndex] = useState(Math.floor(Math.random() * words.length));
-  var palabra = words[indice];
+  var word = words[indice];
   var ganarCond = 0;
 
   if (input.length != 5 || ganar == true || intento == 6) {
@@ -38,9 +42,31 @@ export default function GameScreen() {
 
   useEffect(() => {
     if (vacio.length == 0 && ganarCond != 5) {
-      setPerder(true);
+      setCambio(true)
+      setUltimo({palabra: word, aciertos: aciertos, errados: errados, intentos: intento-1, isFound:false, puntaje: ((aciertos*1000)+(errados*500))*(1-(0.1*(intento-1)))} as historial)
+      setLast(word,aciertos,errados,intento-1,false,((aciertos*1000)+(errados*500))*(1-(0.1*(intento-1))));
+      navigation.navigate("Puntuacion")
+      setIntento(1);
+      setGanar(false);
+      setHistorial([]);
+      setVacio([<Vacio />, <Vacio />, <Vacio />, <Vacio />, <Vacio />]);
+      setIndex(Math.floor(Math.random() * words.length));
+      word = words[indice]
+      aciertos = 0
+      errados = 0
+      ganarCond = 0
     }
   }, [vacio]);
+
+  const setLast = async (palabra: string, aciertos: number, errados: number, intentos: number, isFound: boolean, puntaje: number) => {
+    try {
+      const ultimo: historial = {palabra:palabra, aciertos:aciertos, errados:errados, intentos:intentos, isFound:isFound, puntaje:puntaje}
+      await AsyncStorage.setItem("ultimo",JSON.stringify(ultimo))
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
 
   function Verificar() {
     var spaces = vacio;
@@ -48,16 +74,18 @@ export default function GameScreen() {
     if (input != "" && intento < 6) {
       [...input].map((letter, index) => {
         var letra = letter.toUpperCase();
-        if (palabra.includes(letra)) {
-          if (palabra[index] == letra) {
+        if (word.includes(letra)) {
+          if (word[index] == letra) {
             letras.push(
               <Caja key={letras.length} letra={letra} color="green" />
             );
             ganarCond++;
+            aciertos++;
           } else {
             letras.push(
               <Caja key={letras.length} letra={letra} color="orange" />
             );
+            errados++;
           }
         } else {
           letras.push(<Caja key={letras.length} letra={letra} color="grey" />);
@@ -81,8 +109,19 @@ export default function GameScreen() {
       setVacio([...spaces]);
     }
     if (ganarCond == 5) {
+      setCambio(true)
+      setUltimo({palabra: word, aciertos: aciertos, errados: errados, intentos: intento-1, isFound:true, puntaje: ((aciertos*1000)+(errados*500))*(1-(0.1*(intento-1)))} as historial)
+      setLast(word,aciertos,errados,intento-1,true,((aciertos*1000)+(errados*500))*(1-(0.1*(intento-1))));
+      navigation.navigate("Puntuacion")
+      setIntento(1);
       setGanar(true);
-      setResultados(true);
+      setHistorial([]);
+      setVacio([<Vacio />, <Vacio />, <Vacio />, <Vacio />, <Vacio />]);
+      setIndex(Math.floor(Math.random() * words.length));
+      word = words[indice]
+      aciertos = 0
+      errados = 0
+      ganarCond = 0
     }
     setInput("");
   }
@@ -143,179 +182,6 @@ export default function GameScreen() {
           Enviar
         </Text>
       </TouchableOpacity>
-      <Modal visible={resultados} transparent animationType="fade">
-        <View
-          style={{
-            flex: 1,
-            paddingHorizontal: 20,
-            paddingVertical: 20,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              height: 175,
-              width: 325,
-              borderRadius: 20,
-              alignSelf: "center",
-              alignItems: "center",
-              paddingHorizontal: 10,
-              paddingVertical: 20,
-              backgroundColor: "rgba(255,255,255,1)",
-            }}
-          >
-            <Text style={{ fontSize: 32, marginBottom: 10 }}>
-              ¡Felicidades!
-            </Text>
-            <Text style={{ fontSize: 18, color: "black" }}>
-              Diste con la palabra correcta ¿Pero podras hacerlo otra vez?
-            </Text>
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <View
-                style={{ flexDirection: "row", justifyContent: "space-evenly" }}
-              >
-                <TouchableOpacity
-                  onPress={() => setResultados(false)}
-                  style={{ padding: 5 }}
-                >
-                  <Text
-                    style={{
-                      fontWeight: "bold",
-                      color: "grey",
-                      fontSize: 15,
-                      marginHorizontal: 10,
-                    }}
-                  >
-                    Terminar el juego
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setResultados(false);
-                    setIntento(1);
-                    setGanar(false);
-                    setHistorial([]);
-                    setVacio([
-                      <Vacio />,
-                      <Vacio />,
-                      <Vacio />,
-                      <Vacio />,
-                      <Vacio />,
-                    ]);
-                    setIndex(Math.floor(Math.random() * words.length));
-                    palabra = words[indice];
-                    ganarCond = 0
-                  }}
-                  style={{
-                    backgroundColor: "blue",
-                    borderRadius: 25,
-                    padding: 5,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontWeight: "bold",
-                      color: "white",
-                      fontSize: 18,
-                      marginHorizontal: 10,
-                    }}
-                  >
-                    ¡Otra vez!
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </View>
-      </Modal>
-      <Modal visible={perder} transparent animationType="fade">
-        <View
-          style={{
-            flex: 1,
-            paddingHorizontal: 20,
-            paddingVertical: 20,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              height: 175,
-              width: 325,
-              borderRadius: 20,
-              alignSelf: "center",
-              alignItems: "center",
-              paddingHorizontal: 10,
-              paddingVertical: 20,
-              backgroundColor: "rgba(255,255,255,1)",
-            }}
-          >
-            <Text style={{ fontSize: 32, marginBottom: 10 }}>
-              ¡Has perdido!
-            </Text>
-            <Text style={{ fontSize: 18 }}>
-              La palabra era {palabra} ¿Quieres volver a intentarlo?
-            </Text>
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <View
-                style={{ flexDirection: "row", justifyContent: "space-evenly" }}
-              >
-                <TouchableOpacity
-                  onPress={() => setPerder(false)}
-                  style={{ padding: 5 }}
-                >
-                  <Text
-                    style={{
-                      fontWeight: "bold",
-                      color: "grey",
-                      fontSize: 18,
-                      marginHorizontal: 10,
-                    }}
-                  >
-                    No
-                  </Text>
-                </TouchableOpacity>
-                <View style={{width:50}}/>
-                <TouchableOpacity
-                  onPress={() => {
-                    setPerder(false);
-                    setIntento(1);
-                    setGanar(false);
-                    setHistorial([]);
-                    setVacio([
-                      <Vacio />,
-                      <Vacio />,
-                      <Vacio />,
-                      <Vacio />,
-                      <Vacio />,
-                    ]);
-                    setIndex(Math.floor(Math.random() * words.length));
-                    palabra = words[indice];
-                    ganarCond = 0
-                  }}
-                  style={{
-                    backgroundColor: "blue",
-                    borderRadius: 25,
-                    padding: 5,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontWeight: "bold",
-                      color: "white",
-                      fontSize: 18,
-                      marginHorizontal: 10,
-                    }}
-                  >
-                    Si
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
