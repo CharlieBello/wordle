@@ -28,6 +28,7 @@ export default function GameScreen() {
   ]);
   const [indice, setIndex] = useState(Math.floor(Math.random() * words.length));
   var palabra = words[indice];
+  var ganarCond = 0;
 
   if (input.length != 5 || ganar == true || intento == 6) {
     color = "lightgrey";
@@ -36,7 +37,7 @@ export default function GameScreen() {
   }
 
   useEffect(() => {
-    if (vacio.length == 0) {
+    if (vacio.length == 0 && ganarCond != 5) {
       setPerder(true);
     }
   }, [vacio]);
@@ -44,7 +45,6 @@ export default function GameScreen() {
   function Verificar() {
     var spaces = vacio;
     var letras = [];
-    var ganarCond = 0;
     if (input != "" && intento < 6) {
       [...input].map((letter, index) => {
         var letra = letter.toUpperCase();
@@ -205,6 +205,7 @@ export default function GameScreen() {
                     ]);
                     setIndex(Math.floor(Math.random() * words.length));
                     palabra = words[indice];
+                    ganarCond = 0
                   }}
                   style={{
                     backgroundColor: "blue",
@@ -291,6 +292,7 @@ export default function GameScreen() {
                     ]);
                     setIndex(Math.floor(Math.random() * words.length));
                     palabra = words[indice];
+                    ganarCond = 0
                   }}
                   style={{
                     backgroundColor: "blue",

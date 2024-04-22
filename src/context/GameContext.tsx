@@ -1,10 +1,14 @@
 import { createContext } from "react";
 
-export const GameContext = createContext({} as any);
+interface Puntaje {
+    ultimoPuntaje: number
+}
+
+export const GameContext = createContext([] as Array<Puntaje>);
 
 export const GameProvider = ({children}) => {
     return <GameContext.Provider
-    value={{}}
+    value={[]}
     >
         {children}
     </GameContext.Provider>
