@@ -19,7 +19,7 @@
   <li><Image src="https://placehold.it/15/666666/ffffff?text="></Image> Cada letra incorrecta no añade ningun puntaje</li>
 </ul>
 <h3>Según la cantidad de intentos</h3>
-<p>El sistema de puntuación reduce la puntuación total en un 20% por cada intento adicional</p>
+<p>El sistema de puntuación reduce la puntuación total en un 10% por cada intento adicional</p>
 <h3>Si descubrió la palabra</h3>
 <p>Si al final del juego, el ususario descubre la palabra, se añaden 1.000 puntos</p>
 <h2>Fórmula de puntuación</h2>
