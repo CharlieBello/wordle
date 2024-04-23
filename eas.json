@@ -16,15 +16,7 @@
       "preview4": {
         "distribution": "internal"
       },
-      "production": {
-        "android": {
-            "buildType": "apk",
-            "image": "latest"
-          },
-          "ios": {
-            "image": "latest"
-          }
-      }
+      "production": {}
     }
   }
   
