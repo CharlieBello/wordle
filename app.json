@@ -2,7 +2,7 @@
   "expo": {
     "name": "wordle",
     "slug": "wordle",
-    "version": "1.0.0",
+    "version": "1.6.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -21,10 +21,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.charliedb.wordle"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d26b63aa-a269-4790-b5bc-9a113df26046"
+      }
     }
   }
 }
