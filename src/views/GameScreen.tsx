@@ -15,10 +15,11 @@ import { historial } from "../interface/historial";
 
 export default function GameScreen({navigation}: any) {
   var {setUltimo, setCambio} = useContext(GameContext);
-  const words: string[] = ["COLAR", "ABEJA", "CARAS", "MENOS"];
+  const words: string[] = ["COLAR", "ABEJA", "CARAS", "MENOS", "PALAS", "HIJOS", "KILOS", "AGUJA", "GARRA", "VOLAR"];
   const [input, setInput] = useState("");
   const [intento, setIntento] = useState(1);
-  const [ganar, setGanar] = useState(false);
+  const [right, setRight] = useState(0)
+  const [wrong, setWrong] = useState(0)
   const [historial, setHistorial] = useState([] as React.JSX.Element[]);
   var color = "lightgrey";
   var aciertos = 0
@@ -34,7 +35,7 @@ export default function GameScreen({navigation}: any) {
   var word = words[indice];
   var ganarCond = 0;
 
-  if (input.length != 5 || ganar == true || intento == 6) {
+  if (input.length != 5 || intento == 6) {
     color = "lightgrey";
   } else {
     color = "blue";
@@ -43,11 +44,12 @@ export default function GameScreen({navigation}: any) {
   useEffect(() => {
     if (vacio.length == 0 && ganarCond != 5) {
       setCambio(true)
-      setUltimo({palabra: word, aciertos: aciertos, errados: errados, intentos: intento-1, isFound:false, puntaje: ((aciertos*1000)+(errados*500))*(1-(0.1*(intento-1)))} as historial)
-      setLast(word,aciertos,errados,intento-1,false,((aciertos*1000)+(errados*500))*(1-(0.1*(intento-1))));
+      setUltimo({palabra: word, aciertos: right + aciertos, errados: wrong + errados, intentos: intento, isFound:false, puntaje: (((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1)))} as historial)
+      setLast(word,right + aciertos,wrong + errados,intento,false,(((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1))));
       navigation.navigate("Puntuacion")
       setIntento(1);
-      setGanar(false);
+      setRight(0)
+      setWrong(0)
       setHistorial([]);
       setVacio([<Vacio />, <Vacio />, <Vacio />, <Vacio />, <Vacio />]);
       setIndex(Math.floor(Math.random() * words.length));
@@ -72,6 +74,7 @@ export default function GameScreen({navigation}: any) {
     var spaces = vacio;
     var letras = [];
     if (input != "" && intento < 6) {
+      console.log(aciertos,errados);
       [...input].map((letter, index) => {
         var letra = letter.toUpperCase();
         if (word.includes(letra)) {
@@ -91,6 +94,10 @@ export default function GameScreen({navigation}: any) {
           letras.push(<Caja key={letras.length} letra={letra} color="grey" />);
         }
       });
+      console.log(aciertos,errados);
+      setRight(right+aciertos)
+      setWrong(wrong+errados)
+      console.log(right,wrong);
       setIntento(intento + 1);
       setHistorial([
         ...historial,
@@ -110,11 +117,12 @@ export default function GameScreen({navigation}: any) {
     }
     if (ganarCond == 5) {
       setCambio(true)
-      setUltimo({palabra: word, aciertos: aciertos, errados: errados, intentos: intento-1, isFound:true, puntaje: ((aciertos*1000)+(errados*500))*(1-(0.1*(intento-1)))} as historial)
-      setLast(word,aciertos,errados,intento-1,true,((aciertos*1000)+(errados*500))*(1-(0.1*(intento-1))));
+      setUltimo({palabra: word, aciertos: right + aciertos, errados: wrong + errados, intentos: intento, isFound:true, puntaje: (((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1)))+1000} as historial)
+      setLast(word,right + aciertos,wrong + errados,intento,true,(((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1)))+1000);
       navigation.navigate("Puntuacion")
       setIntento(1);
-      setGanar(true);
+      setRight(0)
+      setWrong(0)
       setHistorial([]);
       setVacio([<Vacio />, <Vacio />, <Vacio />, <Vacio />, <Vacio />]);
       setIndex(Math.floor(Math.random() * words.length));
@@ -168,7 +176,7 @@ export default function GameScreen({navigation}: any) {
         onPress={() => {
           Verificar();
         }}
-        disabled={input.length != 5 || ganar == true || intento == 6}
+        disabled={input.length != 5 || intento == 6}
         style={{ backgroundColor: color, borderRadius: 15 }}
       >
         <Text

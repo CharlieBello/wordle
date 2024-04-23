@@ -31,7 +31,7 @@ export default function PuntajeScreen({navigation}: any) {
             Palabra: {ultimo.palabra}
             </Text>
             <Text style={{ marginLeft: 25, marginTop: 3, fontSize: 18 }}>
-            Letras aciertadas: {ultimo.aciertos}
+            Letras acertadas: {ultimo.aciertos}
             </Text>
             <Text style={{ marginLeft: 25, marginTop: 3, fontSize: 18 }}>
             Letras erroneas: {ultimo.errados}
@@ -57,12 +57,14 @@ export default function PuntajeScreen({navigation}: any) {
             </Text>
         </View>
       </View>
-      <TouchableOpacity onPress={()=> navigation.navigate("Home")}>
-        <Text>Volver al inicio</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={()=> navigation.navigate("Game")}>
-        <Text>Reiniciar</Text>
-      </TouchableOpacity>
+      <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity style={{marginLeft: 75,margin: 5}} onPress={()=> navigation.navigate("Home")}>
+          <Text style={{margin: 8, fontSize: 18, fontWeight:'bold'}}>Volver al inicio</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{margin: 8}} onPress={()=> navigation.navigate("Game")}>
+          <Text style={{padding: 8, fontSize: 18, color: 'white', backgroundColor: 'blue', borderRadius: 10}}>Reiniciar</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

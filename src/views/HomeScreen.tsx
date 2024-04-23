@@ -24,6 +24,7 @@ export default function HomeScreen({ navigation }: any) {
       const json = await AsyncStorage.getItem("ultimo");
       const guardado: historial = JSON.parse(json);
       if (guardado != null) {
+        setCambio(false)
         setUltimo(guardado)
         if (guardado.isFound) {
           encontrada = "fue"
@@ -36,7 +37,7 @@ export default function HomeScreen({ navigation }: any) {
           <View>
             <Text style={{alignSelf: 'center', fontSize: 30, fontWeight: 'bold'}}>Última partida</Text>
             <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>Palabra: {guardado.palabra}</Text>
-            <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>Letras aciertadas: {guardado.aciertos}</Text>
+            <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>Letras acertadas: {guardado.aciertos}</Text>
             <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>Letras erroneas: {guardado.errados}</Text>
             <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>Intentos: {guardado.intentos}</Text>
             <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>La palabra {encontrada} descubierta</Text>
