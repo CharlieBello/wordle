@@ -44,7 +44,7 @@ export default function App() {
         style={styles.camera}
         type={type}
         barCodeScannerSettings={{
-          barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
+          barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13p,BarCodeScanner.Constants.BarCodeType.qr],
         }}
         onBarCodeScanned={(scanned: BarCodeScanningResult) => {
           if (!scan) {
