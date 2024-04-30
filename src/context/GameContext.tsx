@@ -13,19 +13,6 @@ interface GameContextProps {
 export const GameContext = createContext({} as GameContextProps);
 
 export const GameProvider = ({ children }) => {
-    useEffect(()=>{
-        readData();
-    },[])
-
-    const readData = async () => {
-        const querySnapshot = await getDocs(collection(dbInstance, "historial"));
-        querySnapshot.forEach((doc) => {
-          console.log(`${doc.id} => ${doc.data()}`);
-          const list = [{...doc.data()} as historial]
-          setUltimo(list[list.length-1])
-          console.log(ultimo)
-        });
-      };
 
   const [ultimo, setUltimo] = useState({
     palabra: "NINGU",

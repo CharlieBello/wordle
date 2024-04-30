@@ -6,6 +6,7 @@ import { GameContext } from "../context/GameContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { collection, getDocs } from "firebase/firestore/lite";
 import { dbInstance } from "../../firebase";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function HomeScreen({ navigation }: any) {
   var { ultimo, setUltimo, cambio, setCambio } = useContext(GameContext);
@@ -23,20 +24,21 @@ export default function HomeScreen({ navigation }: any) {
   var guardado: historial;
   const readData = async () => {
     const querySnapshot = await getDocs(collection(dbInstance, "historial"));
+    var list: Array<historial> = [];
     querySnapshot.forEach((doc) => {
       console.log(`${doc.id} => ${doc.data()}`);
-      const list = [{ ...doc.data() } as historial];
-      console.log("Lista: ", { ...doc.data() } as historial);
-      setUltimo(list[list.length - 1]);
-      console.log("Ultimo: ",ultimo);
-      guardado = list[list.length - 1];
-      getUltimo();
+      list.push({ ...doc.data() } as historial);
     });
+    console.log("Lista: ", list);
+    setUltimo(list[0]);
+    console.log("Ultimo: ", ultimo);
+    guardado = list[0];
+    getUltimo();
   };
 
   const getUltimo = async () => {
     try {
-      console.log("Guardado: ",guardado);
+      console.log("Guardado: ", guardado);
 
       if (guardado != undefined) {
         setCambio(false);
@@ -100,7 +102,7 @@ export default function HomeScreen({ navigation }: any) {
       </Text>
       <View style={{ height: 60 }} />
       <TouchableOpacity
-        style={{ justifyContent: "center", flexDirection: "row" }}
+        style={{ justifyContent: "center", flexDirection: "row" , backgroundColor: "lightblue", paddingVertical:8}}
         onPress={() => navigation.navigate("Game")}
       >
         <Caja letra="J" color="green" />
@@ -121,12 +123,12 @@ export default function HomeScreen({ navigation }: any) {
       >
         {last}
       </View>
-      <TouchableOpacity
-        style={{ flex: 1, alignItems: "center" }}
-        onPress={() => navigation.navigate("QR")}
+      <View
+        style={{ flex: 1, alignItems: "center", justifyContent: 'center'}}
       >
-        <Text>QR</Text>
-      </TouchableOpacity>
+        <Icon name="qrcode" size={40} color="grey" onPress={() => navigation.navigate("QR")}>
+        </Icon>
+      </View>
       <View
         style={{ flex: 1, alignItems: "center", justifyContent: "flex-end" }}
       >
