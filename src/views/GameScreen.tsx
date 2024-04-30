@@ -12,6 +12,8 @@ import Vacio from "../components/Vacio";
 import { GameContext } from "../context/GameContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { historial } from "../interface/historial";
+import { addDoc, collection } from "firebase/firestore/lite";
+import { dbInstance } from "../../firebase";
 
 export default function GameScreen({navigation}: any) {
   var {setUltimo, setCambio} = useContext(GameContext);
@@ -41,10 +43,26 @@ export default function GameScreen({navigation}: any) {
     color = "blue";
   }
 
+  const insertData = async (palabra: string, aciertos: number, errados: number, intentos: number, isFound: boolean, puntaje: number) => {
+    try {
+      const docRef = await addDoc(collection(dbInstance, "historial"), {
+        palabra: palabra,
+        aciertos: aciertos,
+        errados: errados,
+        intentos: intentos,
+        isFound: isFound,
+        puntaje: puntaje
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
   useEffect(() => {
     if (vacio.length == 0 && ganarCond != 5) {
       setCambio(true)
-      setUltimo({palabra: word, aciertos: right + aciertos, errados: wrong + errados, intentos: intento, isFound:false, puntaje: (((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1)))} as historial)
+      insertData(word, right + aciertos, wrong + errados, intento, false, (((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1))))
       setLast(word,right + aciertos,wrong + errados,intento,false,(((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1))));
       navigation.navigate("Puntuacion")
       setIntento(1);
@@ -117,7 +135,7 @@ export default function GameScreen({navigation}: any) {
     }
     if (ganarCond == 5) {
       setCambio(true)
-      setUltimo({palabra: word, aciertos: right + aciertos, errados: wrong + errados, intentos: intento, isFound:true, puntaje: (((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1)))+1000} as historial)
+      insertData(word, right + aciertos, wrong + errados, intento, true, (((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1)))+1000)
       setLast(word,right + aciertos,wrong + errados,intento,true,(((right + aciertos)*1000)+((wrong + errados)*500))*(1-(0.1*(intento-1)))+1000);
       navigation.navigate("Puntuacion")
       setIntento(1);

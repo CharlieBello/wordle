@@ -4,45 +4,83 @@ import Caja from "../components/Caja";
 import { historial } from "../interface/historial";
 import { GameContext } from "../context/GameContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { collection, getDocs } from "firebase/firestore/lite";
+import { dbInstance } from "../../firebase";
 
 export default function HomeScreen({ navigation }: any) {
   var { ultimo, setUltimo, cambio, setCambio } = useContext(GameContext);
-  var encontrada = ""
+  var encontrada = "";
   const [last, setLast] = useState(
     <View>
       <Text>No hay partidas guardadas</Text>
     </View>
   );
 
-
   useEffect(() => {
-    getUltimo();
+    readData();
   }, [cambio]);
+
+  var guardado: historial;
+  const readData = async () => {
+    const querySnapshot = await getDocs(collection(dbInstance, "historial"));
+    querySnapshot.forEach((doc) => {
+      console.log(`${doc.id} => ${doc.data()}`);
+      const list = [{ ...doc.data() } as historial];
+      console.log("Lista: ", { ...doc.data() } as historial);
+      setUltimo(list[list.length - 1]);
+      console.log("Ultimo: ",ultimo);
+      guardado = list[list.length - 1];
+      getUltimo();
+    });
+  };
 
   const getUltimo = async () => {
     try {
-      const json = await AsyncStorage.getItem("ultimo");
-      const guardado: historial = JSON.parse(json);
-      if (guardado != null) {
-        setCambio(false)
-        setUltimo(guardado)
-        if (guardado.isFound) {
-          encontrada = "fue"
-        }
-        else {
-          encontrada = "no fue"
+      console.log("Guardado: ",guardado);
+
+      if (guardado != undefined) {
+        setCambio(false);
+        if (ultimo.isFound) {
+          encontrada = "fue";
+        } else {
+          encontrada = "no fue";
         }
         console.log("Se guardó el ultimo");
         setLast(
           <View>
-            <Text style={{alignSelf: 'center', fontSize: 30, fontWeight: 'bold'}}>Última partida</Text>
-            <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>Palabra: {guardado.palabra}</Text>
-            <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>Letras acertadas: {guardado.aciertos}</Text>
-            <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>Letras erroneas: {guardado.errados}</Text>
-            <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>Intentos: {guardado.intentos}</Text>
-            <Text style={{marginLeft: 25, marginTop: 3, fontSize: 18}}>La palabra {encontrada} descubierta</Text>
-            <Text style={{alignSelf: 'center', fontSize: 22, fontWeight: 'bold', marginTop: 5}}>Puntaje final</Text>
-            <Text style={{alignSelf: 'center', fontSize: 18}}>{guardado.puntaje}</Text>
+            <Text
+              style={{ alignSelf: "center", fontSize: 30, fontWeight: "bold" }}
+            >
+              Última partida
+            </Text>
+            <Text style={{ marginLeft: 25, marginTop: 3, fontSize: 18 }}>
+              Palabra: {guardado.palabra}
+            </Text>
+            <Text style={{ marginLeft: 25, marginTop: 3, fontSize: 18 }}>
+              Letras acertadas: {guardado.aciertos}
+            </Text>
+            <Text style={{ marginLeft: 25, marginTop: 3, fontSize: 18 }}>
+              Letras erroneas: {guardado.errados}
+            </Text>
+            <Text style={{ marginLeft: 25, marginTop: 3, fontSize: 18 }}>
+              Intentos: {guardado.intentos}
+            </Text>
+            <Text style={{ marginLeft: 25, marginTop: 3, fontSize: 18 }}>
+              La palabra {encontrada} descubierta
+            </Text>
+            <Text
+              style={{
+                alignSelf: "center",
+                fontSize: 22,
+                fontWeight: "bold",
+                marginTop: 5,
+              }}
+            >
+              Puntaje final
+            </Text>
+            <Text style={{ alignSelf: "center", fontSize: 18 }}>
+              {guardado.puntaje}
+            </Text>
           </View>
         );
       }
@@ -78,11 +116,17 @@ export default function HomeScreen({ navigation }: any) {
           width: "85%",
           alignSelf: "center",
           borderRadius: 15,
-          padding: 10
+          padding: 10,
         }}
       >
         {last}
       </View>
+      <TouchableOpacity
+        style={{ flex: 1, alignItems: "center" }}
+        onPress={() => navigation.navigate("QR")}
+      >
+        <Text>QR</Text>
+      </TouchableOpacity>
       <View
         style={{ flex: 1, alignItems: "center", justifyContent: "flex-end" }}
       >

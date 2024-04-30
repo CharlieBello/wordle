@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import HomeScreen from '../views/HomeScreen';
 import GameScreen from '../views/GameScreen';
 import PuntajeScreen from '../views/PuntajeScreen';
+import QRScreen from '../views/qr';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ export default function GameNavigation() {
             <Stack.Screen name='Home' component={HomeScreen} />
             <Stack.Screen name='Game' component={GameScreen} options={{gestureEnabled: false}} />
             <Stack.Screen name='Puntuacion' component={PuntajeScreen} />
+            <Stack.Screen name='QR' component={QRScreen} />
         </Stack.Navigator>
     </NavigationContainer>
   )
